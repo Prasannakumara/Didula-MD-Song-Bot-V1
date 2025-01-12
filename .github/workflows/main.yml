@@ -1,29 +1,33 @@
-name: Deploy to Heroku
+name: Node.js CI
 
 on:
   push:
     branches:
-      - main  # Set the branch you want to deploy from
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  deploy:
+  build:
+
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        node-version: [20.x]
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
     - name: Set up Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
-        node-version: '14'  # Specify the Node.js version
+        node-version: ${{ matrix.node-version }}
 
     - name: Install dependencies
       run: npm install
 
-    - name: Deploy to Heroku
-      uses: akhileshns/heroku-deploy@v3.8.8
-      with:
-        heroku_app_name: 'YOUR_HEROKU_APP_NAME'  # Replace with your Heroku app name
-        heroku_email: 'YOUR_HEROKU_EMAIL'  # Replace with your Heroku email
-        heroku_api_key: ${{ secrets.HEROKU_API_KEY }}  # Set this in your GitHub secret
+    - name: Start application
+      run: npm start
